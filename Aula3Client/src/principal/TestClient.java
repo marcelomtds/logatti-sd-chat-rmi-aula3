@@ -31,6 +31,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class TestClient {
 
 	static String nome;
@@ -102,9 +104,8 @@ public class TestClient {
 
 	private static void inserirMensagemRMI(final String msg) {
 		try {
-			objChat = (IChatAula) Naming.lookup("rmi://localhost:8282/chat");
 			objChat.sendMessage(new Message(nome, formatMessage(msg)));
-		} catch (MalformedURLException | RemoteException | NotBoundException e) {
+		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 	}
@@ -120,7 +121,9 @@ public class TestClient {
 	}
 
 	private static void lerNome() {
-		nome = JOptionPane.showInputDialog("Bem vindo ao chat. Qual é o seu nome?");
+		while (StringUtils.isBlank(nome)) {
+			nome = JOptionPane.showInputDialog("Bem vindo ao chat. Qual é o seu nome?");
+		}
 	}
 
 	private static void criarTela() {
@@ -167,12 +170,14 @@ public class TestClient {
 		jButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-				inserirMensagemDB(jTextField.getText());
-				inserirMensagemRMI(jTextField.getText());
-				jTextField.setText("");
-				jTextField.requestFocus();
-				recuperarChatDB();
-				recuperarChatRMI();
+				if (StringUtils.isNotBlank(jTextField.getText())) {
+					inserirMensagemDB(jTextField.getText());
+					inserirMensagemRMI(jTextField.getText());
+					jTextField.setText("");
+					jTextField.requestFocus();
+					recuperarChatDB();
+					recuperarChatRMI();
+				}
 			}
 		});
 		jFrame.add(jPanel, BorderLayout.CENTER);
@@ -185,13 +190,21 @@ public class TestClient {
 			@Override
 			public void windowClosing(WindowEvent windowEvent) {
 				gerarRelatorio();
+				fecharConexaoDB();
 			}
 		});
 
 	}
 
-	private static void gerarRelatorio() {
+	private static void fecharConexaoDB() {
+		try {
+			stmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
+	private static void gerarRelatorio() {
 		try {
 			PrintWriter writer = new PrintWriter(String.format("C:\\Users\\Marcelo\\Desktop\\relatorio-chat-%s.txt",
 					LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss"))), "UTF-8");
@@ -199,7 +212,9 @@ public class TestClient {
 				writer.println(msg.getMessage());
 			}
 			writer.close();
+			JOptionPane.showMessageDialog(null, "O relatório da última conversa foi gerado com sucesso!");
 		} catch (FileNotFoundException | UnsupportedEncodingException | RemoteException e) {
+			JOptionPane.showMessageDialog(null, "Ocorreu um erro ao gerar o relatório.");
 			e.printStackTrace();
 		}
 	}

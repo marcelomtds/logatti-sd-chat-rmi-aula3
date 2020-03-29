@@ -11,6 +11,7 @@ public class ChatServer {
 		try {
 			LocateRegistry.createRegistry(8282);
 			Naming.rebind("rmi://localhost:8282/chat", new ChatAula());
+			System.out.println("Servidor RMI iniciado com sucesso.");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}

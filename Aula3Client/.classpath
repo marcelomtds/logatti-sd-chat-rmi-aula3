@@ -8,5 +8,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Aula3Util"/>
 	<classpathentry kind="lib" path="C:/Users/Marcelo/Downloads/postgresql-42.2.11.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marcelo/Downloads/commons-lang3-3.10-bin/commons-lang3-3.10/commons-lang3-3.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
